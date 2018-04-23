@@ -71,7 +71,7 @@ count = {}
 
 G = nx.DiGraph()
 
-f = open("./OTCNet_10based.csv","r")
+f = open("./wsn-db/OTCNet_10based.csv","r")
 for l in f:
 	ls = l.strip().split(",")
 	G.add_edge(ls[0], ls[1], weight = int(ls[2])) #int(float(ls[2]) * 10)) # float(ls[2])) ## the weight should already be in the range of -1 to 1
