@@ -25,27 +25,28 @@ def compute_pageRank(G, seed_set, K):
 	nodes = G.nodes()
 	for node in nodes:
 		r[node] = 1.0 / N
-		d[node] = 0.0
+		d[node] = 0
 		outedges = G.out_edges(node, data='weight')
 		for edge in outedges:
-			d[node] += exp(edge[2])		# edge = ('from_ind', 'to_ind', weight)
-	
+			if edge[2] >= 0:
+				d[edge[0]] += edge[2]	# edge = ('from_ind', 'to_ind', weight)
+
 	itr = 0
 	r_new_prime = {}
 	while itr < 1000:
 		epsilon = 0.0
 		S = 0.0
 
-		print '-----------------'
-		print "Iteration number", itr
+		#print '-----------------'
+		#print "Iteration number", itr
 		
 		for node in nodes:
 			inedges = G.in_edges(node, data='weight')
-			
 			r_new_prime[node] = 0.0
 
 			for edge in inedges:
-				r_new_prime[node] += exp(edge[2]) * r[edge[0]] / d[edge[0]]
+				if edge[2]['weight'] > 0:
+					r_new_prime[node] += edge[2]['weight'] * r[edge[0]] / d[edge[0]]
 
 			r_new_prime[node] *= B
 			S += r_new_prime[node]
@@ -58,25 +59,31 @@ def compute_pageRank(G, seed_set, K):
 			ss += r[node]
 			r[node] = r_new
 		
-		print 'epsilon = %.11f' % epsilon
+		#print 'epsilon = %.11f' % epsilon
 		if epsilon < math.pow(10, -10):
-			print 'ExitReason: epsilon became too small =', epsilon
+			#print 'ExitReason: epsilon became too small =', epsilon
 			break
 		itr+=1
     
 	return r
 
 count = {}
+
 G = nx.DiGraph()
 
-f = open("./wsn-db/OTCNet.csv","r")
+f = open("./OTCNet_10based.csv","r")
 for l in f:
 	ls = l.strip().split(",")
-	G.add_edge(ls[0], ls[1], weight = float(ls[2])) #int(float(ls[2]) * 10)) # float(ls[2])) ## the weight should already be in the range of -1 to 1
+	G.add_edge(ls[0], ls[1], weight = int(ls[2])) #int(float(ls[2]) * 10)) # float(ls[2])) ## the weight should already be in the range of -1 to 1
 	
-	if '-' in ls[2]:	# rating is negative
+	if int(ls[2]) < 0 :	# rating is negative
 		count[ls[1]] = count[ls[1]]+1 if (ls[1] in count) else 1
 f.close()
+
+for i in G.nodes():
+	if not i in count:
+		count[i] = 0
+
 
 # ascending sort
 sorted_count = sorted(count.items(), key=operator.itemgetter(1))
@@ -94,9 +101,8 @@ sorted_r = sorted(r.items(), key=operator.itemgetter(1), reverse=True)	# key = l
 
 
 sum = 0
-print '\nPageRanks:'
+print 'Id,TrustRank'
 for rank in sorted_r:
-	print rank
-	sum += rank[1]
+	print rank[0] ," , ", rank[1] 
 
-print sum
+#print sum
