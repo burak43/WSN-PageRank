@@ -7,18 +7,6 @@ import math
 import operator
 from math import exp
 
-#def initialize_scores(G):
-#	N = G.number_of_nodes()
-#
-#	nodes = G.nodes()
-#	for node in nodes:
-#		fairness[node] = 1
-#		try:
-#			goodness[node] = G.in_degree(node, weight='weight')*1.0/G.in_degree(node)
-#		except:
-#			goodness[node] = 0
-#	return fairness, goodness
-
 def compute_pageRank(G):
 	
  	'''inedge = G.in_edges('1', data='weight')
